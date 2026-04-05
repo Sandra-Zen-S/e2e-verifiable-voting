@@ -1,33 +1,79 @@
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from datetime import datetime
 import os
 
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 
-def generate_receipt_pdf(receipt_id, voter_name, voter_id, system_status):
+from backend.translations import translations
 
-    # 🔥 Unique filename (important for download)
+
+# -----------------------------
+# FONT REGISTRATION
+# -----------------------------
+def register_fonts():
+    pdfmetrics.registerFont(TTFont('Hindi', 'backend/fonts/NotoSansDevanagari-Regular.ttf'))
+    pdfmetrics.registerFont(TTFont('Tamil', 'backend/fonts/NotoSansTamil-Regular.ttf'))
+    pdfmetrics.registerFont(TTFont('Telugu', 'backend/fonts/NotoSansTelugu-Regular.ttf'))
+    pdfmetrics.registerFont(TTFont('Malayalam', 'backend/fonts/NotoSansMalayalam-Regular.ttf'))
+
+
+# -----------------------------
+# MAIN FUNCTION
+# -----------------------------
+def generate_receipt_pdf(receipt_id, voter_name, voter_id, system_status, lang="en"):
+
+    register_fonts()
+
+    # 🔥 Select translation
+    text = translations.get(lang, translations["en"])
+
+    # 🔥 Font mapping
+    font_map = {
+        "en": "Helvetica",
+        "hi": "Hindi",
+        "ta": "Tamil",
+        "te": "Telugu",
+        "ml": "Malayalam"
+    }
+
+    font_name = font_map.get(lang, "Helvetica")
+
+    # 🔥 Custom style with font
+    styles = getSampleStyleSheet()
+    custom_style = ParagraphStyle(
+        name="Custom",
+        parent=styles['Normal'],
+        fontName=font_name,
+        fontSize=11
+    )
+
+    title_style = ParagraphStyle(
+        name="Title",
+        parent=styles['Title'],
+        fontName=font_name
+    )
+
+    # 🔥 File creation
     filename = f"receipt_{receipt_id}.pdf"
-
-    # Absolute path (needed for Flask send_file)
     filepath = os.path.abspath(filename)
 
-    styles = getSampleStyleSheet()
     content = []
 
     # -----------------------------
     # TITLE
     # -----------------------------
-    content.append(Paragraph("<b>Electronic Voting Receipt</b>", styles['Title']))
+    content.append(Paragraph(f"<b>{text['title']}</b>", title_style))
     content.append(Spacer(1, 20))
 
     # -----------------------------
     # BASIC DETAILS
     # -----------------------------
-    content.append(Paragraph(f"<b>Voter Name:</b> {voter_name}", styles['Normal']))
-    content.append(Paragraph(f"<b>Voter ID:</b> {voter_id}", styles['Normal']))
-    content.append(Paragraph(f"<b>Receipt ID:</b> {receipt_id}", styles['Normal']))
-    content.append(Paragraph(f"<b>Date:</b> {datetime.now()}", styles['Normal']))
+    content.append(Paragraph(f"<b>{text['voter_name']}:</b> {voter_name}", custom_style))
+    content.append(Paragraph(f"<b>{text['voter_id']}:</b> {voter_id}", custom_style))
+    content.append(Paragraph(f"<b>{text['receipt_id']}:</b> {receipt_id}", custom_style))
+    content.append(Paragraph(f"<b>{text['date']}:</b> {datetime.now()}", custom_style))
 
     content.append(Spacer(1, 15))
 
@@ -38,32 +84,26 @@ def generate_receipt_pdf(receipt_id, voter_name, voter_id, system_status):
 
         content.append(
             Paragraph(
-                "<b>System Status:</b> <font color='red'>COMPROMISED</font>",
-                styles['Normal']
+                f"<b>{text['system_status']}:</b> <font color='red'>{text['compromised']}</font>",
+                custom_style
             )
         )
 
         content.append(
-            Paragraph(
-                "⚠️ WARNING: Unauthorized modification detected in election ledger.",
-                styles['Normal']
-            )
+            Paragraph(text["warn_msg"], custom_style)
         )
 
     else:
 
         content.append(
             Paragraph(
-                "<b>System Status:</b> <font color='green'>SAFE</font>",
-                styles['Normal']
+                f"<b>{text['system_status']}:</b> <font color='green'>{text['safe']}</font>",
+                custom_style
             )
         )
 
         content.append(
-            Paragraph(
-                "✔ Your vote has been securely recorded and verified.",
-                styles['Normal']
-            )
+            Paragraph(text["safe_msg"], custom_style)
         )
 
     content.append(Spacer(1, 20))
@@ -72,12 +112,7 @@ def generate_receipt_pdf(receipt_id, voter_name, voter_id, system_status):
     # DESCRIPTION
     # -----------------------------
     content.append(
-        Paragraph(
-            "This receipt confirms that your encrypted ballot has been securely "
-            "stored in the hash-chained election ledger and validated through "
-            "post-election cryptographic auditing.",
-            styles['Normal']
-        )
+        Paragraph(text["desc"], custom_style)
     )
 
     content.append(Spacer(1, 20))
@@ -86,10 +121,7 @@ def generate_receipt_pdf(receipt_id, voter_name, voter_id, system_status):
     # FOOTER NOTE
     # -----------------------------
     content.append(
-        Paragraph(
-            "<i>Note: This receipt does not reveal your vote, ensuring voter privacy.</i>",
-            styles['Normal']
-        )
+        Paragraph(f"<i>{text['note']}</i>", custom_style)
     )
 
     # -----------------------------
@@ -100,5 +132,4 @@ def generate_receipt_pdf(receipt_id, voter_name, voter_id, system_status):
 
     print("\nPDF Receipt Generated:", filepath)
 
-    # 🔥 VERY IMPORTANT: Return file path
     return filepath
