@@ -45,29 +45,6 @@ This project implements a secure and transparent **End-to-End Verifiable (E2E-V)
 
 ---
 
-## 🏗️ Project Structure
-
-e2e-verifiable-voting/
-│
-├── backend/
-│   ├── crypto/              # Key generation & encryption
-│   ├── ledger/              # Vote storage & verification
-│   ├── tally/               # Vote counting
-│   ├── audit/               # Receipt verification & attacks
-│   ├── fonts/               # Unicode fonts (for multilingual PDF)
-│   ├── generate_receipt_pdf.py
-│   └── translations.py
-│
-├── web/
-│   ├── templates/           # HTML UI (Flask)
-│   └── app.py               # Flask backend
-│
-├── scripts/                 # Simulation scripts
-├── requirements.txt
-├── README.md
-
----
-
 ## ⚙️ Installation
 
 ### 1️⃣ Clone the repository
@@ -179,9 +156,7 @@ This project demonstrates:
 ---
 
 ## 👤 Authors
-Sandrazen S
-Abhinav Yarramsetti
-Arjjitha S
+Sandrazen S, Abhinav Yarramsetti, Arjjitha S
 (B.Tech Computer Science Engineering students from VIT Chennai)
 
 ---
