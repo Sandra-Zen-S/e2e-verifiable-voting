@@ -56,15 +56,15 @@ cd e2e-verifiable-voting
 
 ### 2️⃣ Create virtual environment (recommended)
 
-python3 -m venv venv
-Then activate it:
+python3 -m venv venv \
+Then activate it: \
 source venv/bin/activate
 
 ---
 
 ### 3️⃣ Install dependencies
 
-pip install -r requirements.txt
+pip install -r requirements.txt \
 pip install reportlab
 
 ---
