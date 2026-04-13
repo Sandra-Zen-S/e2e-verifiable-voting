@@ -74,26 +74,30 @@ def verify():
 
         result = verify_receipt(receipt)
 
-        # 🔥 IMPORTANT: attach receipt id for download button
+        # 🔥 attach receipt id for download
         result["receipt"] = receipt
 
     return render_template("verify.html", result=result)
 
 
 # -----------------------------
-# DOWNLOAD PDF
+# DOWNLOAD PDF (UPDATED)
 # -----------------------------
-@app.route('/download/<receipt_id>')
+@app.route('/download/<receipt_id>', methods=["GET", "POST"])
 def download(receipt_id):
 
     voter_name = "User"
     voter_id = "123"
 
+    # 🔥 GET LANGUAGE FROM FRONTEND
+    language = request.form.get("language", "en")
+
     filepath = generate_receipt_pdf(
         receipt_id,
         voter_name,
         voter_id,
-        "SAFE"
+        "SAFE",
+        lang=language   # 🔥 THIS IS THE IMPORTANT CHANGE
     )
 
     return send_file(

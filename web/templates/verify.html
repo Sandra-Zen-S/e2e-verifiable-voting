@@ -37,12 +37,25 @@
 
                     <div class="text-center">
 
-                        <a href="/download/{{ result.receipt }}"
-                           class="btn btn-dark mt-2">
+                        <form method="POST" action="/download/{{ result.receipt }}">
 
-                           ⬇ Download Receipt PDF
+                            <div class="mt-3">
 
-                        </a>
+                                <select name="language" class="form-select mb-2">
+                                    <option value="en">English</option>
+                                    <option value="hi">Hindi</option>
+                                    <option value="ta">Tamil</option>
+                                    <option value="te">Telugu</option>
+                                    <option value="ml">Malayalam</option>
+                                </select>
+
+                                <button class="btn btn-dark">
+                                    ⬇ Download Receipt PDF
+                                </button>
+
+                            </div>
+
+                        </form>
 
                     </div>
 
